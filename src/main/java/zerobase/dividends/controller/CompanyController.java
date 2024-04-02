@@ -3,15 +3,12 @@ package zerobase.dividends.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import zerobase.dividends.domain.Company;
 import zerobase.dividends.dto.CompanyDto;
 import zerobase.dividends.service.CompanyService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/company")
