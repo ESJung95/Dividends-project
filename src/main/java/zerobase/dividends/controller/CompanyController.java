@@ -1,11 +1,17 @@
 package zerobase.dividends.controller;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import zerobase.dividends.domain.Company;
 import zerobase.dividends.dto.CompanyDto;
 import zerobase.dividends.service.CompanyService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/company")
@@ -22,11 +28,16 @@ public class CompanyController {
 
     // 회사 리스트 조회
     @GetMapping
-    public ResponseEntity<?> searchCompany() {
-        return null;
+    public ResponseEntity<?> searchCompany(final Pageable pageable) {
+        Page<Company> companies = this.companyService.getAllCompany(pageable);
+        return ResponseEntity.ok(companies);
     }
 
-    // 각 회사 배당금 데이터 저장
+    /**
+     * 회사 및 배당금 정보 추가
+     * @param request
+     * @return
+     */
     @PostMapping
     public ResponseEntity<?> addCompany(@RequestBody CompanyDto request) {
         String ticker = request.getTicker().trim();
