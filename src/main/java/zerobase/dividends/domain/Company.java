@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import zerobase.dividends.dto.CompanyDto;
 
 @Entity(name = "COMPANY")
 @Getter
@@ -19,4 +20,9 @@ public class Company {
     private String ticker;
 
     private String name;
+
+    public Company(CompanyDto companyDto) {
+        this.ticker = companyDto.getTicker();
+        this.name = companyDto.getName();
+    }
 }

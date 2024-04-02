@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import zerobase.dividends.dto.DividendDto;
 
 import java.time.LocalDateTime;
 
@@ -25,4 +26,10 @@ public class Dividend {
     private LocalDateTime date;
 
     private String dividend;
+
+    public Dividend(Long companyId, DividendDto dividendDto) {
+        this.companyId = companyId;
+        this.date = dividendDto.getDate();
+        this.dividend = dividendDto.getDividend();
+    }
 }
