@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import zerobase.dividends.domain.Company;
@@ -26,6 +27,7 @@ public class CompanyController {
 
     // 회사 리스트 조회
     @GetMapping
+    @PreAuthorize("hasRole('READ')")
     public ResponseEntity<?> searchCompany(final Pageable pageable) {
         Page<Company> companies = this.companyService.getAllCompany(pageable);
         return ResponseEntity.ok(companies);
@@ -33,6 +35,7 @@ public class CompanyController {
 
     // 회사 및 배당금 정보 추가
     @PostMapping
+    @PreAuthorize("hasRole('WRITE')")
     public ResponseEntity<?> addCompany(@RequestBody CompanyDto request) {
         String ticker = request.getTicker().trim();
         if (ObjectUtils.isEmpty(ticker)) {
