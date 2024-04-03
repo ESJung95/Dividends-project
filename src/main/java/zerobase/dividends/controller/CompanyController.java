@@ -20,7 +20,7 @@ public class CompanyController {
     // 검색 시 자동완성
     @GetMapping("/autocomplete")
     public ResponseEntity<?> autocomplete(@RequestParam String keyword) {
-        var result = this.companyService.autocomplete(keyword);
+        var result = this.companyService.getCompanyNameByKeyword(keyword);
         return ResponseEntity.ok(result);
     }
 
