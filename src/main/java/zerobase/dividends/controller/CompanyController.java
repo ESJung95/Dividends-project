@@ -20,7 +20,8 @@ public class CompanyController {
     // 검색 시 자동완성
     @GetMapping("/autocomplete")
     public ResponseEntity<?> autocomplete(@RequestParam String keyword) {
-        return null;
+        var result = this.companyService.autocomplete(keyword);
+        return ResponseEntity.ok(result);
     }
 
     // 회사 리스트 조회
@@ -30,11 +31,7 @@ public class CompanyController {
         return ResponseEntity.ok(companies);
     }
 
-    /**
-     * 회사 및 배당금 정보 추가
-     * @param request
-     * @return
-     */
+    // 회사 및 배당금 정보 추가
     @PostMapping
     public ResponseEntity<?> addCompany(@RequestBody CompanyDto request) {
         String ticker = request.getTicker().trim();
@@ -43,6 +40,7 @@ public class CompanyController {
         }
 
         CompanyDto companyDto = this.companyService.save(ticker);
+        this.companyService.addAutocompleteKeyword(companyDto.getName());
 
         return ResponseEntity.ok(companyDto);
     }
