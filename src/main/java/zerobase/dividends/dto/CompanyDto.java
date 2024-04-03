@@ -1,10 +1,12 @@
 package zerobase.dividends.dto;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CompanyDto {
 
     private String ticker;
