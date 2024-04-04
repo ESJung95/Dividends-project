@@ -43,7 +43,7 @@ public class MemberService implements UserDetailsService {
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 ID 입니다."));
 
         // 사용자에게 받아오는 password 인코딩해서 비교
-        if (this.passwordEncoder.matches(member.getPassword(), user.getPassword())) {
+        if (!this.passwordEncoder.matches(member.getPassword(), user.getPassword())) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
 

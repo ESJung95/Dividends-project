@@ -28,7 +28,7 @@ public class TokenProvider {
 
     private final MemberService memberService;
 
-    @Value("{jwt.secret.key}")
+    @Value("${jwt.secret.key}")
     private String secretKey;
 
     // 토큰 생성(발급)
