@@ -1,6 +1,7 @@
 package zerobase.dividends.controller;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import zerobase.dividends.service.CompanyService;
 @RestController
 @RequestMapping("/company")
 @AllArgsConstructor
+@Slf4j
 public class CompanyController {
 
     private final CompanyService companyService;
@@ -29,6 +31,7 @@ public class CompanyController {
     @GetMapping
     @PreAuthorize("hasRole('READ')")
     public ResponseEntity<?> searchCompany(final Pageable pageable) {
+        log.info("회사 조회 요청이 들어왔습니다.");
         Page<Company> companies = this.companyService.getAllCompany(pageable);
         return ResponseEntity.ok(companies);
     }
