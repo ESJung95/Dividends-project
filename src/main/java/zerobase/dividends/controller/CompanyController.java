@@ -2,6 +2,7 @@ package zerobase.dividends.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import zerobase.dividends.domain.Company;
 import zerobase.dividends.dto.CompanyDto;
 import zerobase.dividends.service.CompanyService;
+import zerobase.dividends.type.CacheKey;
 
 @RestController
 @RequestMapping("/company")
@@ -19,6 +21,8 @@ import zerobase.dividends.service.CompanyService;
 public class CompanyController {
 
     private final CompanyService companyService;
+
+    private final CacheManager redisCacheManager;
 
     // 검색 시 자동완성
     @GetMapping("/autocomplete")
@@ -31,7 +35,6 @@ public class CompanyController {
     @GetMapping
     @PreAuthorize("hasRole('READ')")
     public ResponseEntity<?> searchCompany(final Pageable pageable) {
-        log.info("회사 조회 요청이 들어왔습니다.");
         Page<Company> companies = this.companyService.getAllCompany(pageable);
         return ResponseEntity.ok(companies);
     }
@@ -52,8 +55,16 @@ public class CompanyController {
     }
 
     // 각 회사 배당금 데이터 삭제
-    @DeleteMapping
-    public ResponseEntity<?> deleteCompany() {
-        return null;
+    @DeleteMapping("/{ticker}")
+    @PreAuthorize("hasRole('WRITE')")
+    public ResponseEntity<?> deleteCompany(@PathVariable String ticker) {
+        String companyName =  this.companyService.deleteCompany(ticker);
+        this.clearFinanceCache(companyName);
+        return ResponseEntity.ok(companyName);
+    }
+
+    // 데이터를 지우면 항상 캐시도 삭제
+    public void clearFinanceCache(String companyName) {
+        this.redisCacheManager.getCache(CacheKey.KEY_FINANCE).evict(companyName);
     }
 }
