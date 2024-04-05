@@ -5,6 +5,7 @@ import zerobase.dividends.dto.ScrapedResultDto;
 
 public class NaverFinanceScraper implements Scraper{
 
+    // TODO
     @Override
     public CompanyDto scrapCompanyByTicker(String ticker) {
         return null;

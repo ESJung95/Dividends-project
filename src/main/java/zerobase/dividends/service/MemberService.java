@@ -38,6 +38,7 @@ public class MemberService implements UserDetailsService {
         }
 
         member.setPassword(this.passwordEncoder.encode(member.getPassword()));
+        log.info("New member register success -> " + member.getUsername());
         return this.memberRepository.save(member.toEntity());
     }
 
@@ -50,7 +51,7 @@ public class MemberService implements UserDetailsService {
         if (!this.passwordEncoder.matches(member.getPassword(), user.getPassword())) {
             throw new NoMatchPassword();
         }
-
+        log.info("User authenticate success -> " + member.getUsername());
         return user;
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import zerobase.dividends.domain.Company;
 import zerobase.dividends.dto.CompanyDto;
+import zerobase.dividends.exception.impl.EmptyTicker;
 import zerobase.dividends.service.CompanyService;
 import zerobase.dividends.type.CacheKey;
 
@@ -27,6 +28,7 @@ public class CompanyController {
     // 검색 시 자동완성
     @GetMapping("/autocomplete")
     public ResponseEntity<?> autocomplete(@RequestParam String keyword) {
+        log.info("Autocomplete request for keyword -> " + keyword);
         var result = this.companyService.getCompanyNameByKeyword(keyword);
         return ResponseEntity.ok(result);
     }
@@ -35,6 +37,7 @@ public class CompanyController {
     @GetMapping
     @PreAuthorize("hasRole('READ')")
     public ResponseEntity<?> searchCompany(final Pageable pageable) {
+        log.info("All company list check request");
         Page<Company> companies = this.companyService.getAllCompany(pageable);
         return ResponseEntity.ok(companies);
     }
@@ -43,13 +46,14 @@ public class CompanyController {
     @PostMapping
     @PreAuthorize("hasRole('WRITE')")
     public ResponseEntity<?> addCompany(@RequestBody CompanyDto request) {
+        log.info("Request add company");
         String ticker = request.getTicker().trim();
         if (ObjectUtils.isEmpty(ticker)) {
-            throw new RuntimeException("ticker is empty");
+            throw new EmptyTicker();
         }
 
         CompanyDto companyDto = this.companyService.save(ticker);
-        this.companyService.addAutocompleteKeyword(companyDto.getName());
+        this.companyService.autocompleteKeyword(companyDto.getName());
 
         return ResponseEntity.ok(companyDto);
     }
@@ -58,6 +62,7 @@ public class CompanyController {
     @DeleteMapping("/{ticker}")
     @PreAuthorize("hasRole('WRITE')")
     public ResponseEntity<?> deleteCompany(@PathVariable String ticker) {
+        log.info("Request delete company");
         String companyName =  this.companyService.deleteCompany(ticker);
         this.clearFinanceCache(companyName);
         return ResponseEntity.ok(companyName);

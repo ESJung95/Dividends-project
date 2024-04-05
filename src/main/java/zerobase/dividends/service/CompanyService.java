@@ -34,18 +34,19 @@ public class CompanyService {
     public CompanyDto save(String ticker) {
         boolean exists = this.companyRepository.existsByTicker(ticker);
         if (exists) {
+            log.error("already esists ticker -> " + ticker);
             throw new RuntimeException("already exits ticker -> " + ticker);
         }
         return this.storeCompanyAndDividend(ticker);
     }
 
     public Page<Company> getAllCompany(final Pageable pageable) {
-        log.info("모든 정보 조회 중");
+        log.info("Get all company info");
         return this.companyRepository.findAll(pageable);
     }
 
     private CompanyDto storeCompanyAndDividend(String ticker) {
-        log.info("회사 및 배당금 정보 저장을 시작합니다. ticker -> " + ticker);
+        log.info("Storing company and dividend information for ticker -> " + ticker);
         // ticker 를 기준으로 회사를 스크래핑
         CompanyDto companyDto = this.yahooFinanceScraper.scrapCompanyByTicker(ticker);
         if (ObjectUtils.isEmpty(companyDto)) {
@@ -61,28 +62,23 @@ public class CompanyService {
                                                 .map(e -> new Dividend(company.getId(), e))
                                                 .collect(Collectors.toList());
         this.dividendRepository.saveAll(dividendList);
-        log.info("회사 및 배당금 정보 저장이 완료되었습니다.");
+        log.info("Company and dividend information stored successfully.");
         return companyDto;
     }
 
     public List<String> getCompanyNameByKeyword(String keyword) {
         Pageable limit = PageRequest.of(0, 10);
         Page<Company> companies = this.companyRepository.findByNameStartingWithIgnoreCase(keyword, limit);
+        log.info("Get company name by keyword -> " + keyword);
         return companies.stream()
                             .map(Company::getName)
                             .collect(Collectors.toList());
     }
 
-    public void addAutocompleteKeyword(String keyword) {
+    public void autocompleteKeyword(String keyword) {
         this.trie.put(keyword, null);
     }
 
-//    public List<String> autocomplete(String keyword) {
-//        return (List<String>) this.trie.prefixMap(keyword).keySet()
-//                .stream()
-//                .limit(10)
-//                .collect(Collectors.toList());
-//    }
     public void deleteAutocompleteKeyword(String keyword) {
         this.trie.remove(keyword);
     }
@@ -95,6 +91,7 @@ public class CompanyService {
         this.companyRepository.delete(company);
 
         this.deleteAutocompleteKeyword(company.getName());
+        log.info("Delete company with ticker -> " + ticker);
         return company.getName();
     }
 }
