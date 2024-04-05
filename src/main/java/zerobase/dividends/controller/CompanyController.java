@@ -15,6 +15,8 @@ import zerobase.dividends.exception.impl.EmptyTicker;
 import zerobase.dividends.service.CompanyService;
 import zerobase.dividends.type.CacheKey;
 
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/company")
 @AllArgsConstructor
@@ -70,6 +72,6 @@ public class CompanyController {
 
     // 데이터를 지우면 항상 캐시도 삭제
     public void clearFinanceCache(String companyName) {
-        this.redisCacheManager.getCache(CacheKey.KEY_FINANCE).evict(companyName);
+        Objects.requireNonNull(this.redisCacheManager.getCache(CacheKey.KEY_FINANCE)).evict(companyName);
     }
 }
