@@ -12,7 +12,7 @@ import zerobase.dividends.dto.AuthDto;
 import zerobase.dividends.exception.impl.AlreadyExistUserException;
 import zerobase.dividends.exception.impl.NoExistIdException;
 import zerobase.dividends.exception.impl.NoExistUserException;
-import zerobase.dividends.exception.impl.NoMatchPassword;
+import zerobase.dividends.exception.impl.NoMatchPasswordException;
 import zerobase.dividends.repository.MemberRepository;
 
 @Service
@@ -43,13 +43,13 @@ public class MemberService implements UserDetailsService {
     }
 
     // 로그인 시 검증
-    public Member authenticate(AuthDto.SignIn member) {
+    public Member authenticate(AuthDto.LogIn member) {
         var user = this.memberRepository.findByUsername(member.getUsername())
                                      .orElseThrow(NoExistIdException::new);
 
         // 사용자에게 받아오는 password 인코딩해서 비교
         if (!this.passwordEncoder.matches(member.getPassword(), user.getPassword())) {
-            throw new NoMatchPassword();
+            throw new NoMatchPasswordException();
         }
         log.info("User authenticate success -> " + member.getUsername());
         return user;

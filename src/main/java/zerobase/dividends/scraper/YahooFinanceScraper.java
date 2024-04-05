@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 import zerobase.dividends.dto.CompanyDto;
 import zerobase.dividends.dto.DividendDto;
 import zerobase.dividends.dto.ScrapedResultDto;
+import zerobase.dividends.exception.impl.FailedSaveCompanyDtoException;
+import zerobase.dividends.exception.impl.FailedSaveResultDtoException;
+import zerobase.dividends.exception.impl.NoExistEumMonthException;
 import zerobase.dividends.type.Month;
 
 import java.io.IOException;
@@ -54,17 +57,20 @@ public class YahooFinanceScraper implements Scraper {
                 String dividend = splits[3];
 
                 if (month < 0) {
-                    throw new RuntimeException("Unexpected Month enum value ->" + splits[0]);
+                    throw new NoExistEumMonthException();
                 }
 
                 dividendDtos.add(new DividendDto(LocalDateTime.of(year, month, day, 0, 0), dividend));
 
             }
             scrapResultDto.setDividends(dividendDtos);
+        } catch (FailedSaveResultDtoException e) {
+            e.getMessage();
+
         } catch (IOException e) {
-            // TODO
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
+
         return scrapResultDto;
     }
 
@@ -78,8 +84,11 @@ public class YahooFinanceScraper implements Scraper {
             String title = titleElement.text().split("\\(")[0].trim();
 
             return new CompanyDto(ticker, title);
+        } catch (FailedSaveCompanyDtoException e) {
+            e.getMessage();
+
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return null;

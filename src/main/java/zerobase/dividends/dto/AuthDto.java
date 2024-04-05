@@ -8,12 +8,12 @@ import java.util.List;
 public class AuthDto {
 
     @Data
-    public static class SignOut {
+    public static class Logout {
         private String username;
     }
 
     @Data
-    public static class SignIn {
+    public static class LogIn {
         private String username;
         private String password;
     }

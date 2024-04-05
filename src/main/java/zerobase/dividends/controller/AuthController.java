@@ -18,7 +18,6 @@ import zerobase.dividends.service.MemberService;
 public class AuthController {
 
     private final MemberService memberService;
-
     private final TokenProvider tokenProvider;
 
     @PostMapping("/signup")
@@ -28,9 +27,9 @@ public class AuthController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("/signin")
-    public ResponseEntity<?> signin(@RequestBody AuthDto.SignIn request) {
-        log.info("Signin request for username -> " + request.getUsername());
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody AuthDto.LogIn request) {
+        log.info("Longin request for username -> " + request.getUsername());
         // 아이디와 패스워드가 일치하는지 확인 = 패스워드 검증
         var member = this.memberService.authenticate(request);
         // 토큰을 생성해서 반환
@@ -40,9 +39,9 @@ public class AuthController {
     }
 
     // TODO _ 로그아웃 기능 구현
-    @PostMapping("/signout")
-    public ResponseEntity<?> signout(@RequestBody AuthDto.SignOut request) {
-        log.info("Signout request for username -> " + request.getUsername());
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody AuthDto.Logout request) {
+        log.info("Logout request for username -> " + request.getUsername());
         return null;
     }
 

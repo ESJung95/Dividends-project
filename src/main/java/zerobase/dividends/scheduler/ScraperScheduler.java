@@ -25,7 +25,6 @@ public class ScraperScheduler {
 
     private final CompanyRepository companyRepository;
     private final DividendRepository dividendRepository;
-
     private final Scraper yahooFinanceScraper;
 
     // 일정 주기마다 수행
@@ -33,6 +32,7 @@ public class ScraperScheduler {
     @Scheduled(cron = "${scheduler.scrap.yahoo}")
     public void yahooFinanceScheduling() {
         log.info("scraping scheduler is started");
+
         // 저장된 회사 목록을 조회
         List<Company> companies = this.companyRepository.findAll();
 
@@ -42,9 +42,9 @@ public class ScraperScheduler {
             ScrapedResultDto scrapedResultDto = this.yahooFinanceScraper.scrap(
                             new CompanyDto(company.getTicker(), company.getName()));
 
-        // 스크래핑한 배당금 정보 중 데이터베이스에 없는 값은 저장
+            // 스크래핑한 배당금 정보 중 데이터베이스에 없는 값만 저장
             scrapedResultDto.getDividends().stream()
-                    // 디비든 모델을 디비든 엔티티로 매핑
+                    // 디비든 모델 - 디비든 엔티티로 매핑
                     .map(e -> new Dividend(company.getId(), e))
                     // 엘리먼트를 하나씩 디비든 레파지토리에 삽입
                     .forEach(e -> {

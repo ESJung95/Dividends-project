@@ -12,6 +12,8 @@ import zerobase.dividends.domain.Company;
 import zerobase.dividends.domain.Dividend;
 import zerobase.dividends.dto.CompanyDto;
 import zerobase.dividends.dto.ScrapedResultDto;
+import zerobase.dividends.exception.impl.ExistCompanyException;
+import zerobase.dividends.exception.impl.FailedScrapingException;
 import zerobase.dividends.exception.impl.NoCompanyException;
 import zerobase.dividends.repository.CompanyRepository;
 import zerobase.dividends.repository.DividendRepository;
@@ -34,8 +36,8 @@ public class CompanyService {
     public CompanyDto save(String ticker) {
         boolean exists = this.companyRepository.existsByTicker(ticker);
         if (exists) {
-            log.error("already esists ticker -> " + ticker);
-            throw new RuntimeException("already exits ticker -> " + ticker);
+            log.error("already exists ticker -> " + ticker);
+            throw new ExistCompanyException();
         }
         return this.storeCompanyAndDividend(ticker);
     }
@@ -50,7 +52,8 @@ public class CompanyService {
         // ticker 를 기준으로 회사를 스크래핑
         CompanyDto companyDto = this.yahooFinanceScraper.scrapCompanyByTicker(ticker);
         if (ObjectUtils.isEmpty(companyDto)) {
-            throw new RuntimeException("failed to scrap ticker ->" + ticker);
+            log.info("failed scraping = non-exist company -> " + ticker);
+            throw new FailedScrapingException();
         }
 
         // 해당 회사가 존재할 경우, 회사의 배당금 정보를 스크래핑

@@ -11,7 +11,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import zerobase.dividends.domain.Company;
 import zerobase.dividends.dto.CompanyDto;
-import zerobase.dividends.exception.impl.EmptyTicker;
+import zerobase.dividends.exception.impl.EmptyTickerException;
 import zerobase.dividends.service.CompanyService;
 import zerobase.dividends.type.CacheKey;
 
@@ -24,7 +24,6 @@ import java.util.Objects;
 public class CompanyController {
 
     private final CompanyService companyService;
-
     private final CacheManager redisCacheManager;
 
     // 검색 시 자동완성
@@ -37,7 +36,7 @@ public class CompanyController {
 
     // 회사 리스트 조회
     @GetMapping
-    @PreAuthorize("hasRole('READ')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> searchCompany(final Pageable pageable) {
         log.info("All company list check request");
         Page<Company> companies = this.companyService.getAllCompany(pageable);
@@ -46,12 +45,12 @@ public class CompanyController {
 
     // 회사 및 배당금 정보 추가
     @PostMapping
-    @PreAuthorize("hasRole('WRITE')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> addCompany(@RequestBody CompanyDto request) {
         log.info("Request add company");
         String ticker = request.getTicker().trim();
         if (ObjectUtils.isEmpty(ticker)) {
-            throw new EmptyTicker();
+            throw new EmptyTickerException();
         }
 
         CompanyDto companyDto = this.companyService.save(ticker);
@@ -62,7 +61,7 @@ public class CompanyController {
 
     // 각 회사 배당금 데이터 삭제
     @DeleteMapping("/{ticker}")
-    @PreAuthorize("hasRole('WRITE')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteCompany(@PathVariable String ticker) {
         log.info("Request delete company");
         String companyName =  this.companyService.deleteCompany(ticker);
@@ -70,7 +69,7 @@ public class CompanyController {
         return ResponseEntity.ok(companyName);
     }
 
-    // 데이터를 지우면 항상 캐시도 삭제
+    // 캐시 삭제
     public void clearFinanceCache(String companyName) {
         Objects.requireNonNull(this.redisCacheManager.getCache(CacheKey.KEY_FINANCE)).evict(companyName);
     }
