@@ -12,6 +12,7 @@ import zerobase.dividends.domain.Company;
 import zerobase.dividends.domain.Dividend;
 import zerobase.dividends.dto.CompanyDto;
 import zerobase.dividends.dto.ScrapedResultDto;
+import zerobase.dividends.exception.impl.NoCompanyException;
 import zerobase.dividends.repository.CompanyRepository;
 import zerobase.dividends.repository.DividendRepository;
 import zerobase.dividends.scraper.Scraper;
@@ -88,7 +89,7 @@ public class CompanyService {
 
     public String deleteCompany(String ticker) {
         var company = this.companyRepository.findByTicker(ticker)
-                               .orElseThrow(() -> new RuntimeException("존재하지 않는 회사입니다."));
+                               .orElseThrow(NoCompanyException::new);
 
         this.dividendRepository.deleteAllByCompanyId(company.getId());
         this.companyRepository.delete(company);

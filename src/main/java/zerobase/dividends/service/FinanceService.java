@@ -9,6 +9,7 @@ import zerobase.dividends.domain.Dividend;
 import zerobase.dividends.dto.CompanyDto;
 import zerobase.dividends.dto.DividendDto;
 import zerobase.dividends.dto.ScrapedResultDto;
+import zerobase.dividends.exception.impl.NoCompanyException;
 import zerobase.dividends.repository.CompanyRepository;
 import zerobase.dividends.repository.DividendRepository;
 import zerobase.dividends.type.CacheKey;
@@ -29,7 +30,7 @@ public class FinanceService {
         log.info("search company -> " + companyName);
         // 1. 회사명을 기준으로 회사 정보를 조회
         Company company = this.companyRepository.findByName(companyName)
-                                        .orElseThrow(() -> new RuntimeException("존재하지 않는 회사명 입니다."));
+                                        .orElseThrow(NoCompanyException::new);
 
         // 2. 조회된 회사의 ID 로 배당금 정보 조회
         List<Dividend> dividends = this.dividendRepository.findAllByCompanyId(company.getId());
